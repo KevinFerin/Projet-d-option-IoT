@@ -1,0 +1,10 @@
+# To execute in prod : -Dspring.profiles.active=prod to JVM
+spring.profiles.active: dev
+spring.profiles.include: 'security'
+
+spring.application.name: imta-cdi-service
+server.port: 11041
+
+eureka:
+  client:
+    register-with-eureka: false
