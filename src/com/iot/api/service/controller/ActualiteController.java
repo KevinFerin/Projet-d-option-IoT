@@ -1,8 +1,8 @@
-package com.imta.cdi.service.model.controller;
+package com.iot.api.service.controller;
 
 
-import com.imta.cdi.service.model.model.ActualiteEntity;
-import com.imta.cdi.service.model.repository.ActualiteRepository;
+import com.iot.api.service.model.ActualiteEntity;
+import com.iot.api.service.repository.ActualiteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

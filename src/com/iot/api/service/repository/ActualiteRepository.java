@@ -1,6 +1,6 @@
-package com.imta.cdi.service.model.repository;
+package com.iot.api.service.repository;
 
-import com.imta.cdi.service.model.model.ActualiteEntity;
+import com.iot.api.service.model.ActualiteEntity;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.imta.cdi.service.model.model;
+package com.iot.api.service.model;
 
 
 import javax.persistence.*;

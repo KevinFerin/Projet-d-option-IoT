@@ -2,7 +2,7 @@
 spring.profiles.active: dev
 spring.profiles.include: 'security'
 
-spring.application.name: imta-cdi-service
+spring.application.name: iot-api-service
 server.port: 11041
 
 eureka:

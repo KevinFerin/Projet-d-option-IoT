@@ -1,4 +1,4 @@
-package  com.imta.cdi.service.model;
+package com.iot.api.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

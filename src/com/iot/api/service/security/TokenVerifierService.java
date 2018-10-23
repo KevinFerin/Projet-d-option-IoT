@@ -1,4 +1,4 @@
-package com.imta.cdi.service.model.security;
+package com.iot.api.service.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

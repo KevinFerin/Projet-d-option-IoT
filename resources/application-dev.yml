@@ -1,6 +1,6 @@
 spring:
   application:
-    name: cdi-backend
+    name: iot-backend
   jpa:
     hibernate.ddl-auto: update
   datasource:
