@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IMTA.iml" filepath="$PROJECT_DIR$/IMTA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/IOT.iml" filepath="$PROJECT_DIR$/IOT.iml" />
     </modules>
   </component>
 </project>
