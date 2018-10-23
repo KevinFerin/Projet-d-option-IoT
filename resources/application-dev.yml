@@ -3,8 +3,10 @@ spring:
     name: iot-backend
   jpa:
     hibernate.ddl-auto: update
-  datasource:
-    url: jdbc:mysql://localhost:3306/data
-    username: root
-    password: root
+  influxdb:
+    url: http://vps379075.ovh.net:8086
+    username: user
+    password: ~
+    database: test
+    retention-policy: autogen
 
