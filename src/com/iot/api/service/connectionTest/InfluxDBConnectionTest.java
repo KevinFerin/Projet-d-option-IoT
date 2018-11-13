@@ -32,8 +32,9 @@ public class InfluxDBConnectionTest {
         }
         if (!contains){
             connection.query(new Query("CREATE DATABASE security", "security"));
-            connection.disableBatch();
+
         }
+        connection.disableBatch();
         // Connect to database assumed on the server with default credentials.
         return  connection;
 
