@@ -86,7 +86,7 @@ public class APIController {
             }
         }
 
-        if (!contains){
+        if (contains){
             BatchPoints batchPoints = BatchPoints.database(dbName).build();
             Point pointToWrite = Point.measurement(pointName).addField("field1", param1)
                     .addField("field2", param2)
@@ -106,6 +106,59 @@ public class APIController {
         connection.close();
         return "Point writed in Channel : " + dbName;
     }
+
+    @RequestMapping(value="/bdd/delete", method= RequestMethod.GET)
+    String deletePoint(@RequestParam String SecurityKey, @RequestParam String dbName, @RequestParam String pointName){
+
+        String retour="";
+        InfluxDB connection = influxDB.connectDatabase();
+        if (this.selectChannelKey(dbName)!=SecurityKey){
+            return "Key Error !";
+        }
+        boolean contains = false;
+        for (String e :connection.describeDatabases()){
+            if (e.equals(dbName)){
+                contains = true;
+                break;
+            }
+        }
+
+        /*if (contains){
+            connection.query(new Query("DELETE FROM "+ name, dbName));
+        }
+        else{
+            retour = "Database doesn't exist !";
+        }*/
+        connection.close();
+        return "Point writed in Channel : " + dbName;
+    }
+
+    @RequestMapping(value="/bdd/reset", method= RequestMethod.GET)
+    String resetBdd(@RequestParam String SecurityKey, @RequestParam String dbName){
+
+        String retour="";
+        InfluxDB connection = influxDB.connectDatabase();
+        if (this.selectChannelKey(dbName)!=SecurityKey){
+            return "Key Error !";
+        }
+        boolean contains = false;
+        for (String e :connection.describeDatabases()){
+            if (e.equals(dbName)){
+                contains = true;
+                break;
+            }
+        }
+
+        if (contains){
+            connection.deleteDatabase(dbName);
+        }
+        else{
+            retour = "Database doesn't exist !";
+        }
+        connection.close();
+        return "Channel Deleted : " + dbName;
+    }
+
 
     @RequestMapping(value="/bdd/createChannel", method = RequestMethod.GET)
     String createChannel(@RequestParam String name){
