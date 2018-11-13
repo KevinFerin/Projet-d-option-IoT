@@ -16,9 +16,26 @@ public class InfluxDBConnectionTest {
 
 
     public InfluxDB connectDatabase() {
-
+        InfluxDB connection = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
+        connection.enableBatch(100, 200, TimeUnit.MILLISECONDS);
+        boolean contains = false;
+        Query query = new Query("SHOW DATABASES", "security");
+        QueryResult result = connection.query(query);
+        List<List<Object>> databases = result.getResults().get(0).getSeries().get(0).getValues();
+        for (List<Object> e : databases){
+            for (Object p : e){
+                if (p.toString() == "security"){
+                    contains = true;
+                    break;
+                }
+            }
+        }
+        if (!contains){
+            connection.query(new Query("CREATE DATABASE security", "security"));
+            connection.disableBatch();
+        }
         // Connect to database assumed on the server with default credentials.
-        return  InfluxDBFactory.connect("http://51.255.167.53:8086", "admin", "admin");
+        return  connection;
 
     }
 
