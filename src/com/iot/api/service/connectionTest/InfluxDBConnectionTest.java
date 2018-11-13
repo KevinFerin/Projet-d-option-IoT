@@ -24,7 +24,7 @@ public class InfluxDBConnectionTest {
         List<List<Object>> databases = result.getResults().get(0).getSeries().get(0).getValues();
         for (List<Object> e : databases){
             for (Object p : e){
-                if (p.toString() == "security"){
+                if (p.toString().equals("security")){
                     contains = true;
                     break;
                 }

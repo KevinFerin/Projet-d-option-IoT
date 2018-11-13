@@ -38,8 +38,8 @@ public class APIController {
     InfluxDBConnectionTest influxDB = new InfluxDBConnectionTest();
 
     APIRepository repository = new APIRepository();
-
-    String selectChannelKey(String dbName){
+    @RequestMapping(value="/bdd/post1", method= RequestMethod.GET)
+    String selectChannelKey(@RequestParam String dbName){
         String retour = "";
         InfluxDB connection = influxDB.connectDatabase();
         connection.enableBatch(100, 200, TimeUnit.MILLISECONDS);
@@ -75,7 +75,7 @@ public class APIController {
                      @RequestParam String param4, @RequestParam String param5, @RequestParam String param6, @RequestParam String param7, @RequestParam String param8) {
         String retour="";
         InfluxDB connection = influxDB.connectDatabase();
-        if (this.selectChannelKey(dbName)!=SecurityKey){
+        if (!this.selectChannelKey(dbName).equals(SecurityKey)){
             return "Key Error !";
         }
         boolean contains = false;
@@ -112,7 +112,7 @@ public class APIController {
 
         String retour="";
         InfluxDB connection = influxDB.connectDatabase();
-        if (this.selectChannelKey(dbName)!=SecurityKey){
+        if (!this.selectChannelKey(dbName).equals(SecurityKey)){
             return "Key Error !";
         }
         boolean contains = false;
@@ -133,12 +133,13 @@ public class APIController {
         return "Point writed in Channel : " + dbName;
     }
 
-    @RequestMapping(value="/bdd/reset", method= RequestMethod.GET)
+    @RequestMapping(value="/bdd/deleteChannel", method= RequestMethod.GET)
     String resetBdd(@RequestParam String SecurityKey, @RequestParam String dbName){
 
         String retour="";
         InfluxDB connection = influxDB.connectDatabase();
-        if (this.selectChannelKey(dbName)!=SecurityKey){
+
+        if (!this.selectChannelKey(dbName).equals(SecurityKey)){
             return "Key Error !";
         }
         boolean contains = false;
