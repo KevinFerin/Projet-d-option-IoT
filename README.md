@@ -8,4 +8,7 @@ Session du 23 Octobre :
   
 Session du 29 Octobre : 
   Rédaction du cahier des charges le 6 Novembre. Code d'une api par personne
+  
+Objectif du 14 Janvier:
+  Avoir fini la data viz
 
