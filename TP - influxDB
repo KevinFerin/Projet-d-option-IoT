@@ -1,0 +1,32 @@
+INSTALLATION DE INFLUXDB
+
+Windows 64bits : 
+Go to https://dl.influxdata.com/influxdb/releases/influxdb-1.7.0_windows_amd64.zip
+ and download the last version of influxDB (1.7.0) at the time I write this. 
+
+Then unzip that file in your folder and remember the PATH of that folder. 
+
+Open the console command line and go to the PATH of your unzipped file. 
+You have to write : 
+    >> cd PATH\influxdb-1.7.0_windows_amd64\influxdb-1.7.0-1
+    >> influxd.exe 
+Those lines permit to launch the local server which will be “localhost:8086”
+
+Then open another cmd window and write : 
+>> cd PATH\influxdb-1.7.0_windows_amd64\influxdb-1.7.0-1
+>> influx.exe
+This binary launch the command line interface of InfluxDB, from this window you will be able to write commands. 
+
+Go manually to your PATH  and open influxdb.conf then look for “bind”.
+Change the previous value which is “:8086” to the new value is “0.0.0.0:8086” (line 239)
+
+Try it out with the following line which will create you an account : 
+    >> CREATE USER admin WITH PASSWORD 'admin'
+
+Here we go, InfluxDB is installed and ready. 
+
+Windows 32bits : 
+I am sorry but you’ll struggle more to install InfluxDB as InfluxDB is only supported on the 64bits version of Windows. So you’ll have to use a Docker to run it. 
+
+
+
