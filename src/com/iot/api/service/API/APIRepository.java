@@ -16,7 +16,7 @@ public class APIRepository {
     private String username = "";
     private String password= "";
 
-
+    //fonction permettant d'écrire un point avec la rétention policy choisie
     public void writePoint(Point point, String database, String retentionPolicy){
         InfluxDB influxDB = InfluxDBFactory.connect(urlConnection, username, password);
 
@@ -35,7 +35,7 @@ public class APIRepository {
         influxDB.disableBatch();
         influxDB.close();
     }
-
+    //fonction permettant de récupérer sous forme de liste les résultats d'une requete influxdb
     public List<QueryResult.Result> query(String query, String database){
         InfluxDB influxDB = InfluxDBFactory.connect(urlConnection, username, password);
 

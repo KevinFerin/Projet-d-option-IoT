@@ -14,11 +14,14 @@ import java.util.concurrent.TimeUnit;
 
 public class InfluxDBConnectionTest {
 
-
+    // Fonction permettant de lier l'application donc l'API à la base influxdb
     public InfluxDB connectDatabase() {
+        //identifiants influx de connexion
         InfluxDB connection = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
         connection.enableBatch(100, 200, TimeUnit.MILLISECONDS);
         boolean contains = false;
+
+        // Partie peu importante pour le TP : création des tables de sécurité
         Query query = new Query("SHOW DATABASES", "security");
         QueryResult result = connection.query(query);
         List<List<Object>> databases = result.getResults().get(0).getSeries().get(0).getValues();
@@ -36,6 +39,7 @@ public class InfluxDBConnectionTest {
         }
         connection.disableBatch();
         // Connect to database assumed on the server with default credentials.
+        //retourne la connexion si la connexion s'est bien déroulée
         return  connection;
 
     }
