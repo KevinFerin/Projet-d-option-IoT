@@ -8,12 +8,26 @@
 </head>
 <body>
 <div id="container" style="width: 550px; height: 400px; margin: 0 auto"></div>
+
 <script language="JavaScript">
+var element = document.documentElement;
+var dbName = "examples";
+document.write("<FORM>");
+document.write("<SELECT NAME='SelectMenu' onChange='AllerA(this.form)'>");
+$.getJSON('http://localhost:11041/bdd/getdblist', function (data) { 
+    for (var i=0; i<data.length; i++){
+        document.write("<OPTION>" +data[i]);
+    }
+});
+
+document.write('</SELECT>');
+document.write('</FORM>');
+// -->
 
 /**
  * Load new data depending on the selected min and max
  */
- $.getJSON('http://localhost:11041/bdd/data', function (data) {
+ $.getJSON('http://localhost:11041/bdd/data?dbName='+dbName, function (data) {
 
 // create the chart
 Highcharts.stockChart('container', {
