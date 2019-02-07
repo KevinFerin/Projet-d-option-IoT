@@ -1,5 +1,5 @@
 package com.iot.api.service.API;
-
+import com.iot.api.service.API.APIRepository;
 import com.iot.api.service.connectionTest.InfluxDBConnectionTest;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
@@ -69,11 +69,10 @@ public class APIController {
         }
         connection.close();
         return retour;
-}
+    }
     //Fonction permettant d'écrire un point dans la base de donnée : entrée : le capteur envoie le channel et les fields avec la clé de sécurité et la fonction écrit ce point dans le channel
     @RequestMapping(value="/bdd/post", method= RequestMethod.GET)
-    String postPoint(@RequestParam String dbName, @RequestParam String SecurityKey, @RequestParam String param1, @RequestParam String param2, @RequestParam String param3,
-                     @RequestParam String param4, @RequestParam String param5, @RequestParam String param6, @RequestParam String param7, @RequestParam String param8) {
+    String postPoint(@RequestParam String dbName, @RequestParam String SecurityKey, @RequestParam double[] params) {
         String retour="";
         InfluxDB connection = influxDB.connectDatabase();
         //SECURITE pas important pour le TP
@@ -89,19 +88,17 @@ public class APIController {
         }
 
         if (contains){
+
+
             //fonction permettant de choisir la base de donnée ou écrire
             BatchPoints batchPoints = BatchPoints.database(dbName).build();
-           //fonction permettant d'écrire le point en mettant les valeurs pour chaque field (intéressant pour le TP)
-            Point pointToWrite = Point.measurement("minute").addField("field1", param1)
-                    .addField("field2", param2)
-                    .addField("field3", param3)
-                    .addField("field4", param4)
-                    .addField("field5", param5)
-                    .addField("field6", param6)
-                    .addField("field7", param7)
-                    .addField("field8", param8)
-                    .build();
-            batchPoints.point(pointToWrite);
+            //fonction permettant d'écrire le point en mettant les valeurs pour chaque field (intéressant pour le TP)
+            Object pointToWrite = Point.measurement("minute");
+            for (int i=0; i<(params.length<=8 ? params.length : 8);i++){
+                ((Point.Builder) pointToWrite).addField("field"+i, params[i]);
+            }
+            ((Point.Builder) pointToWrite).build();
+            batchPoints.point((Point)pointToWrite);
             connection.write(batchPoints);
         }
         else{
@@ -112,26 +109,35 @@ public class APIController {
     }
     //Fonction de l'API permettant d'envoyer les données des capteurs sur l'outil de visualisation, pas important pour le TP
     @RequestMapping(value="/bdd/data", method = RequestMethod.GET)
-    List<List<Object>> getData2 (@RequestParam String dbName){
+    List<List<Object>> getData2 (@RequestParam String dbName, @RequestParam int numField){
         InfluxDB connection = influxDB.connectDatabase();
         Query queryObject = new Query("select * from minute", dbName);
         QueryResult queryResult = connection.query(queryObject);
         connection.close();
+        List<List<Object>> ret = new ArrayList<>();
         for (List<Object> o : queryResult.getResults().get(0).getSeries().get(0).getValues()){
+            List<Object> rett = new ArrayList<>();
             String toConvert = (String)o.get(0);
             toConvert = toConvert.replace("T", " ").replace("Z", "");
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 Date parsedDate = dateFormat.parse(toConvert);
                 Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-                o.set(0, timestamp.getTime());
+                rett.add(timestamp.getTime());
+                rett.add(o.get(numField));
+                rett.add(o.get(numField));
+                rett.add(o.get(numField));
+                rett.add(o.get(numField));
+                ret.add(rett);
+
             } catch(Exception e) { //this generic but you can control another types of exception
                 // look the origin of excption
             }
 
         }
 
-        return queryResult.getResults().get(0).getSeries().get(0).getValues();
+
+        return ret;
     }
     @RequestMapping(value="/bdd/getdblist", method= RequestMethod.GET)
     List<String> getdbList() {
@@ -148,9 +154,9 @@ public class APIController {
         }
         return ret;
     }
-    //fonction permettant de supprimer un point dans une base de donnée influx
-    @RequestMapping(value="/bdd/delete", method= RequestMethod.GET)
-    String deletePoint(@RequestParam String SecurityKey, @RequestParam String dbName, @RequestParam String pointName){
+    //fonction permettant de supprimer un channel dans une base de donnée influx
+    @RequestMapping(value="/bdd/deleteChannel", method= RequestMethod.GET)
+    String deleteChannel(@RequestParam String SecurityKey, @RequestParam String dbName){
 
         String retour="";
         //SECURITE pas important pour le TP
@@ -167,41 +173,25 @@ public class APIController {
         }
 
         /*if (contains){
-            connection.query(new Query("DELETE FROM "+ name, dbName));
+            connection.query(new Query("DELETE FROM minute", dbName));
         }
         else{
             retour = "Database doesn't exist !";
         }*/
         connection.close();
-        return "Point writed in Channel : " + dbName;
+        return "Channel cleared : " + dbName;
     }
 
-    @RequestMapping(value="/bdd/deleteChannel", method= RequestMethod.GET)
-    String resetBdd(@RequestParam String SecurityKey, @RequestParam String dbName){
+    //fonction permettant de supprimer un point dans une base de donnée influx
+    @RequestMapping(value="/bdd/reset", method= RequestMethod.GET)
+    String resetChannel(@RequestParam String SecurityKey, @RequestParam String dbName){
 
-        String retour="";
-        InfluxDB connection = influxDB.connectDatabase();
-
-        if (!this.selectChannelKey(dbName).equals(SecurityKey)){
-            return "Key Error !";
-        }
-        boolean contains = false;
-        for (String e :connection.describeDatabases()){
-            if (e.equals(dbName)){
-                contains = true;
-                break;
-            }
-        }
-
-        if (contains){
-            connection.deleteDatabase(dbName);
-        }
-        else{
-            retour = "Database doesn't exist !";
-        }
-        connection.close();
-        return "Channel Deleted : " + dbName;
+        this.deleteChannel(SecurityKey, dbName);
+        this.createChannel(dbName, SecurityKey);
+        return "Channel reset went ok : " + dbName;
     }
+
+
 
     //fonction permettant d'écrire un channel
     @RequestMapping(value="/bdd/createChannel", method = RequestMethod.GET)
@@ -221,6 +211,39 @@ public class APIController {
         }
         if (!contains){
             retour = this.randomString(25);
+            //fonction permettant d'executer une requete influx en l'occurence ici create database pour creer la base de données
+            connection.query(new Query("CREATE DATABASE "+ name, name));
+            BatchPoints batchPoints = BatchPoints.database("security").build();
+            Point pointSecurityKey = Point.measurement(name).addField("key", retour).build();
+            batchPoints.point(pointSecurityKey);
+            connection.write(batchPoints);
+
+            connection.disableBatch();
+        }
+        else{
+            retour = "Database already exist !";
+        }
+        connection.close();
+        return retour + " Clé de Sécurité associée au Channel : nécessaire à l'insertion / suppression / modification du Channel " + name;
+    }
+
+
+    String createChannel(String name, String key){
+
+        String retour = "";
+
+        InfluxDB connection = influxDB.connectDatabase();
+        connection.enableBatch(100, 200, TimeUnit.MILLISECONDS);
+        //SECURITE pas important pour le TP
+        boolean contains = false;
+        for (String e :connection.describeDatabases()){
+            if (e.equals(name)){
+                contains = true;
+                break;
+            }
+        }
+        if (!contains){
+            retour = key;
             //fonction permettant d'executer une requete influx en l'occurence ici create database pour creer la base de données
             connection.query(new Query("CREATE DATABASE "+ name, name));
             BatchPoints batchPoints = BatchPoints.database("security").build();
