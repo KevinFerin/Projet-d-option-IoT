@@ -72,7 +72,7 @@ public class APIController {
 }
     //Fonction permettant d'écrire un point dans la base de donnée : entrée : le capteur envoie le channel et les fields avec la clé de sécurité et la fonction écrit ce point dans le channel
     @RequestMapping(value="/bdd/post", method= RequestMethod.GET)
-    String postPoint(@RequestParam String pointName, @RequestParam String dbName, @RequestParam String SecurityKey, @RequestParam String param1, @RequestParam String param2, @RequestParam String param3,
+    String postPoint(@RequestParam String dbName, @RequestParam String SecurityKey, @RequestParam String param1, @RequestParam String param2, @RequestParam String param3,
                      @RequestParam String param4, @RequestParam String param5, @RequestParam String param6, @RequestParam String param7, @RequestParam String param8) {
         String retour="";
         InfluxDB connection = influxDB.connectDatabase();
@@ -92,7 +92,7 @@ public class APIController {
             //fonction permettant de choisir la base de donnée ou écrire
             BatchPoints batchPoints = BatchPoints.database(dbName).build();
            //fonction permettant d'écrire le point en mettant les valeurs pour chaque field (intéressant pour le TP)
-            Point pointToWrite = Point.measurement(pointName).addField("field1", param1)
+            Point pointToWrite = Point.measurement("minute").addField("field1", param1)
                     .addField("field2", param2)
                     .addField("field3", param3)
                     .addField("field4", param4)
@@ -112,9 +112,9 @@ public class APIController {
     }
     //Fonction de l'API permettant d'envoyer les données des capteurs sur l'outil de visualisation, pas important pour le TP
     @RequestMapping(value="/bdd/data", method = RequestMethod.GET)
-    List<List<Object>> getData2 (){
+    List<List<Object>> getData2 (@RequestParam String dbName){
         InfluxDB connection = influxDB.connectDatabase();
-        Query queryObject = new Query("select * from day", "examples");
+        Query queryObject = new Query("select * from minute", dbName);
         QueryResult queryResult = connection.query(queryObject);
         connection.close();
         for (List<Object> o : queryResult.getResults().get(0).getSeries().get(0).getValues()){
@@ -132,6 +132,21 @@ public class APIController {
         }
 
         return queryResult.getResults().get(0).getSeries().get(0).getValues();
+    }
+    @RequestMapping(value="/bdd/getdblist", method= RequestMethod.GET)
+    List<String> getdbList() {
+        // Partie peu importante pour le TP : création des tables de sécurité
+        InfluxDB connection = influxDB.connectDatabase();
+        Query query = new Query("SHOW DATABASES", "security");
+        QueryResult result = connection.query(query);
+        List<List<Object>> databases = result.getResults().get(0).getSeries().get(0).getValues();
+        List<String> ret = new ArrayList<String>();
+        for (List<Object> e : databases){
+            for (Object p : e){
+                ret.add((String)p);
+            }
+        }
+        return ret;
     }
     //fonction permettant de supprimer un point dans une base de donnée influx
     @RequestMapping(value="/bdd/delete", method= RequestMethod.GET)
