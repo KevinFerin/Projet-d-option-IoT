@@ -1,0 +1,77 @@
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Highcharts</title>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+</head>
+<body>
+<div id="container" style="width: 550px; height: 400px; margin: 0 auto"></div>
+<script language="JavaScript">
+
+/**
+ * Load new data depending on the selected min and max
+ */
+ $.getJSON('http://localhost:11041/bdd/data', function (data) {
+
+// create the chart
+Highcharts.stockChart('container', {
+
+
+    rangeSelector: {
+        selected: 3,
+        buttons: [{
+            type: 'minute',
+            count: 10,
+            text: '10min'
+        }, {
+            type: 'hour',
+            count: 1,
+            text: '1hour'
+        },{
+            type: 'day',
+            count: 1,
+            text: '1day'
+        },{
+            type: 'month',
+            count: 1,
+            text: '1month'
+        }, {
+            type: 'all',
+            text: 'All'
+        }]
+    },
+
+    title: {
+        text: 'Stock Value de la température'
+    },
+
+    series: [{
+        type: 'candlestick',
+        name: 'Evolution de la température au cours du temps ',
+        data: data,
+        dataGrouping: {
+            units: [[
+                'minute',
+                [1, 2, 5, 10, 15, 30]
+            ], [
+                'hour',
+                [1, 2, 3, 4, 6, 8, 12]
+            ], [
+                'day',
+                [1,3,5]
+            ], [
+                'week',
+                [1]
+            ]]
+        }
+        
+    }]
+});
+});
+
+
+</script>
+</body>
+</html>
